@@ -27,6 +27,30 @@ ship_size = {
     "Carrier" : 5
 }
 
+ships_location = {
+    "small" : {
+        "Battleship" : [],
+        "Cruiser" : [],
+        "Submarine" : [],
+        "Destroyer" : [],
+        "Carrier" : []
+        },
+    "medium" : {
+        "Battleship" : [],
+        "Cruiser" : [],
+        "Submarine" : [],
+        "Destroyer" : [],
+        "Carrier" : []
+        },
+    "large" : {
+        "Battleship" : [],
+        "Cruiser" : [],
+        "Submarine" : [],
+        "Destroyer" : [],
+        "Carrier" : []
+        }     
+    }
+
 def placeShips(ukuran):
     " This is where the ships location determined "
     # ship format <Shipname> <x> <y> <direction>
@@ -72,7 +96,6 @@ def writeShot(x,y,cmd):
 
 ### PROTOTYPE ###
 found_ship = False          # mengecek apakah kita sudah menemukan sebuah kapal musuh
-search_ship = True          # digunakan untuk memastikan kita masih mencari kapal musuh
 first_hit = (-1,-1)         # titik pertama kali menemukan kapal musuh
 last_hit = (-1,-1)          # menyimpan titik terakhir yang ditembak
 hit_orientation = "n"       # menyimpan orientasi tembakan dalam urutan atas, bawah, kanan, kiri
@@ -93,9 +116,12 @@ def createListOfShot(ukuran):
         output: list of tuple (x,y)
     """
 
-def updateListOfShot(shot_list):
-    """
-
+def updateListOfShot(shot_list, last_hit):
+    """ Mengupdate shot_list dengan menghapus titik yang telah ditembak (last_hit).
+        param:
+            last_hit = [tuple] titik yang terakhir ditembak
+            shot_list = [list] kumpulan titik yang belum ditembak
+        output: list of tuple (x,y) koordinat yang belum ditembak
     """
 
 def countEffectiveShots(center, weapon):
@@ -104,7 +130,7 @@ def countEffectiveShots(center, weapon):
         param:
             center = [tuple] center point dari tembakan
             weapon = [string] jenis tembakannya
-        output: jumlah titik shot yang belum ditembak sebelumnya
+        output:  integer jumlah titik shot yang belum ditembak sebelumnya
     """
 
 def isCrossShotDiagonalAvail (charge, list_of_ships) :
@@ -140,3 +166,30 @@ def isDoubleShotAvail (charge, list_of_ships) :
             list_of_ships = [list] list kapal yang kita miliki
         output: boolean bisa tidaknya senjata digunakan
     """
+
+def isOpponentKilled (count_ships_opp, list_opp_ships) :
+    """ Mengembalikan nilai boolean apakah jumlah kapal lawan berkurang dari sebelumnya.
+        Membandingkan, jika length dari list_opp_ships lebih sedikit dari count_ships_opp
+        maka akan mengembalikan true.
+        param:
+            count_ships_opp = [integer] jumlah kapal sebelum tembakan terakhir
+            list_opp_ships = [list] list kapal yang dimiliki lawan
+        output: boolean apakah jumlah kapal lawan lebih sedikit dibandingkan jumlah sebelum tembakan terakhir
+    """
+    
+def isOpponentShielded (point):
+    """ Mengembalikan nilai boolean true jika titik yang player tembak sedang dilindungi.
+        Param:
+            point = [tuple] titik yang player tembak
+        output: boolean dilindungi atau tidaknya titik yang ditembak
+    """
+
+    
+def isShipDamage(ships):
+    """
+    """
+    
+    
+def isShieldNeeded()
+
+
