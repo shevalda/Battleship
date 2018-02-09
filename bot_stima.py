@@ -183,12 +183,6 @@ def isOpponentShielded (point):
             point = [tuple] titik yang player tembak
         output: boolean dilindungi atau tidaknya titik yang ditembak
     """
-
-    
-def isShipDamage(ships):
-    """
-    """
-    
     
 def isShieldNeeded()
 
