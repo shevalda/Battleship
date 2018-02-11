@@ -198,7 +198,7 @@ def playerShipsAttacked(player_ships):
             hit = False
             while i < len(ship['Cells']) and not(hit):
                 if ship['Cells'][i]['Hit']:
-                    list_of_ships.extend(ship['ShipType'])
+                    list_of_ships.append(ship['ShipType'])
                     hit = True
                 i += 1
     return list_of_ships
