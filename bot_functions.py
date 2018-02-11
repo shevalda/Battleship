@@ -5,7 +5,25 @@ def createListOfShot(map_size):
             map_size = [string] ukuran map ("small", "medium", "large")
         output: list of tuple (x,y)
     """
-    # TO BE CONTINUED
+    # TO BE CONTINUE
+    if (map_size % 2 == 1) :
+        max = map_size - 1
+        min = 0
+        i = 0
+        to_be_shot = []
+        while (i<=(max/2)) :
+            j = i + 1
+            while (i <= max-j) :
+                to_be_shot.append(min+i,j)
+                to_be_shot.append(j,min+i)
+                j += 2
+            j = i + 1
+            while (i <= max-j) :
+                to_be_shot.append(max-i,j)
+                to_be_shot.append(j,max-i)
+                j += 2
+            i += 1
+    elif (map_size % 2 == 0) :
 
 
 def updateListOfShot(to_be_shot, last_shot):
@@ -18,7 +36,7 @@ def updateListOfShot(to_be_shot, last_shot):
         to_be_shot.remove(last_shot)
 
 
-def countEffectiveShots(center, weapon, enemy_map):
+def countEffectiveShots(center, weapon, enemy_map,to_be_shot):
     """
         Menghitung tembakan yang efektif jika diketahui center point dan jenis tembakannya
         param:
@@ -27,12 +45,24 @@ def countEffectiveShots(center, weapon, enemy_map):
             enemy_map = [list of list] peta musuh berserta detilnya
         output:  integer jumlah titik shot yang belum ditembak sebelumnya
     """
+    count = 0
     if weapon == 'DiagonalCrossShot':
+        if (center[0]-1, center[1]+1) in to_be_shot :
+            count += 1
+        if (center[0]-1, center[1]-1) in to_be_shot :
+            count += 1
+        if (center[0]+1, center[1]+1) in to_be_shot :
+            count += 1
+        if (center[0]+1, center[1]-1) in to_be_shot :
+            count += 1
+        if center in to_be_shot :
+            count += 1
     elif weapon == 'SeekerMissile':
-    elif weapon == 'DoubleShotVer':
-    elif weapon == 'DoubleShotVer:
-    # TO BE CONTINUED
-
+        for i in range (-2,2) :
+            for j in range (-2,2) :
+                if (center[0]+i,center[1]+j) in to_be_shot :
+                    count += 1
+    return count
 
 def playerShipsAttacked(player_ships):
     """
@@ -105,9 +135,6 @@ def nextOrientationHitPoint(last_shot, first_hit):
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri timur
         return (first_hit[0] - 1, first_hit[1])
-    # else:
-    #     # setelah menelusuri barat
-    #     return (-1, -1)
 
 
 def nextShipHit(last_shot, first_hit):
@@ -140,6 +167,7 @@ def nextSearchShot(enemy_map, to_be_shot):
         output: (x,y) titik yang akan ditembak & jenis senjata (dalam bentuk key dari commands)
     """
     # TO BE CONTINUED 
+
 
 
 def isLastShotHit(last_hit_count, state):

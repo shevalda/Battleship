@@ -167,7 +167,7 @@ def arrangingAStrategy():
             cmd = commands['SingleShot']
         elif not(got_a_hit) and found_ship:
             # jika pada awalnya sudah menemukan kapal tetapi tembakan tidak hit
-            if bf.countEnemyShipsDestroyed(state) == last_enemy_ships_count:
+            if bf.`nemyShipsDestroyed(state) == last_enemy_ships_count:
                 # jika kapal musuh yang hidup ternyata belum berkurang
                 if bf.isEnemyShielded(last_shot, state):
                     # jika ternyata titik sebelumnya di-shield oleh lawan
