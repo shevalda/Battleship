@@ -69,12 +69,12 @@ def createListOfShot(map_size):
             map_size = [string] ukuran map ("small", "medium", "large")
         output: list of tuple (x,y)
     """
-    
+    to_be_shot = []
+
     if (map_size % 2 == 0) : #panjang dan lebar peta adalah genap
         min = 0
         max = map_size/2
-        to_be_shot = []
-
+        
         while (max > min):
             [x,y] = [min,min]
             to_be_shot.append([x,y])
