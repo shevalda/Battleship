@@ -72,23 +72,23 @@ def main(player_key):
     if state['Phase'] == 1:     # Phase 1
         to_be_shot = bf.createListOfShot(map_size)
 
-        putVariableInJSONFile(bot_variable_file, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+        putVariableInJSONFile(bot_variable_file, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
         placeShips(map_size)
     else:                       # Phase 2
-        map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command = getVariablefromJSON(output_path, bot_variable_file)
+        map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command = getVariablefromJSON(bot_variable_file)
 
         enemy_map = bf.generateEnemyMap(state, map_size)
         player_ships = state['PlayerMap']['Owner']['Ships']
 
-        bf.decideCoordinatesBeforeStrategy(last_command, last_shot, enemy_map, possibleShipLoc, to_be_shot, map_size)
+        last_shot, possibleShipLoc = bf.decideCoordinatesBeforeStrategy(last_command, last_shot, enemy_map, possibleShipLoc, to_be_shot, map_size)
 
         x, y, cmd = arrangingAStrategy()
 
         last_enemy_ships_count = bf.countEnemyShipsDestroyed(state)
         last_hit_count = bf.getShotsHit(state)
 
-        putVariableInJSONFile(bot_variable_file, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+        putVariableInJSONFile(bot_variable_file, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
         writeCommand(x, y, cmd)
 
@@ -138,7 +138,7 @@ def writeCommand(x, y, cmd):
     f.close
 
 
-def putVariableInJSONFile(file_name, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
+def putVariableInJSONFile(file_name, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
     """
         Menuliskan variabel-variabel dalam program ke file JSON
     """
@@ -156,16 +156,16 @@ def putVariableInJSONFile(file_name, output_path, map_size, enemy_map, player_sh
     data['possibleShipLoc'] = possibleShipLoc
     data['last_command'] = last_command
 
-    fn = open(os.path.join(output_path, file_name), 'w')
+    fn = open(file_name, 'w')
     json.dump(data, fn)
     fn.close()
 
 
-def getVariablefromJSON(output_path, file_name):
+def getVariablefromJSON(file_name):
     """
         Memasukkan nilai variabel dari file JSON ke program
     """
-    fn = open(os.path.join(output_path, file_name), 'r')
+    fn = open(file_name, 'r')
     data = json.load(fn)
     fn.close()
 

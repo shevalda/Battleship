@@ -9,8 +9,10 @@ def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_b
             possibleShipLoc = [tuple of integer] titik-titik pertama menemukan sebuah kapal
         output: (x,y) yang akan dijadikan last_shot yang diberikan ke fungsi arrangingAStrategy & list titik-titik yang mungkin menjadi lokasi kapal lain
     """
+    last_shot = (-1,-1)
     if cmd == 1:        # single shot
         to_be_shot = updateListOfShot(to_be_shot, point)
+        last_shot = point
     elif cmd == 5:      # diagonal cross shot
         if (not enemy_map[point[0]][point[1]]['Missed']):           # center point
             possibleShipLoc.append((point[0], point[1]))
@@ -59,6 +61,7 @@ def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_b
             for i in range(point[0]-2, point[1]+2+1):
                 for j in range(point[1]-2, point[1]+2+1):
                     to_be_shot = updateListOfShot(to_be_shot, (i,j))
+            last_shot = point
 
     return last_shot, possibleShipLoc
 
