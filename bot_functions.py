@@ -66,40 +66,34 @@ def createListOfShot(map_size):
     """
         Membuat list dari titik yang akan ditembak
         param:
-            map_size = [string] ukuran map ("small", "medium", "large")
+            map_size = [int] ukuran map (7 (small), 10 (medium), 14 (large))
         output: list of tuple (x,y)
     """
     to_be_shot = []
 
-    if (map_size == "medium" or map_size == "large")  : #panjang dan lebar peta adalah genap
+    if (map_size == 7)  : #panjang dan lebar peta adalah genap
         min = 0
-        max = map_size/2
-        
-        while (max > min):
+        max = map_size - 1 #panjang petanya - 1
+
+        while (max >= min):
             [x,y] = [min,min]
             to_be_shot.append([x,y])
-            while (x+2 < max)  :
+            while (x+2 <= max)  :
                 x= x+2
                 to_be_shot.append([x,y])
                 if (y != x) :
                     to_be_shot.append([y,x])
-            x = x+1
-            y = y+1
-
+            y = y+2
             while (y<=max) :
                 to_be_shot.append([x,y])
                 if (y != x) :
                     to_be_shot.append ([y,x])
                 y = y+2
-
             max = max - 1
             min = min + 1
-        
-        # inisialisasi ulang setelah nilai min dan max berubah    
-        min = 0 
-        max = map_size/2 + 1
+        min = 0
+        max = map_size - 1
         add = 0
-
         while (y < max) :
             x = min +1 + add
             y = min + add
@@ -109,11 +103,42 @@ def createListOfShot(map_size):
                     to_be_shot.append ([y,x])
                 x = x + 2
             add = add + 1
-
-        return to_be_shot
     else :
-        
-        # TO BE CONTINUED
+        min = 0
+        max = map_size - 1 #panjang petanya - 1
+        while (max > min):
+            [x,y] = [min,min]
+            to_be_shot.append([x,y])
+
+            while (x+2 < max)  :
+                x= x+2
+                to_be_shot.append([x,y])
+                if (y != x) :
+                    to_be_shot.append([y,x])
+            x = x+1
+            y = y+1
+            while (y<=max) :
+                to_be_shot.append([x,y])
+                if (y != x) :
+                    to_be_shot.append ([y,x])
+                y = y+2
+            max = max - 1
+            min = min + 1
+        min = 0
+        max = map_size - 1 #panjang petanya - 1
+        add = 0
+        x = min +1 + add
+        y = min + add
+        while (y < max) :
+            x = min +1 + add
+            y = min + add
+            while (x <= max) :
+                to_be_shot.append([x,y])
+                if (y != x) :
+                    to_be_shot.append ([y,x])
+                x = x + 2
+            add = add + 1
+    return to_be_shot
 
 
 def updateListOfShot(to_be_shot, last_shot):
@@ -252,14 +277,43 @@ def nextShipHit(last_shot, first_hit):
         return (last_shot[0] - 1, last_shot[1])
 
 
-def nextSearchShot(enemy_map, to_be_shot):
+def nextSearchShot(enemy_map, to_be_shot,map_size):
     """
         Menentukan titik mana yang akan ditembak dan dengan senjata apa
         enemy_map = []
         to_be_shot = [list of tuple]
         output: (x,y) titik yang akan ditembak & jenis senjata (dalam bentuk key dari commands)
     """
-    # if isFireSeekerAvail(state, getShipWeaponEnergy('', player_ships), player_ships):
+    dummy = (-1,-1)
+    center = dummy
+    i = 0
+    if isCrossShotDiagonalAvail(state, getShipWeaponEnergy('Battleship', player_ships), player_ships):
+        max = countEffectiveShots(to_be_shot[i],'DiagonalCrossShot', enemy_map, map_size)
+        while (max<5 and i<len(to_be_shot)):
+            i += 1
+            max = countEffectiveShots(to_be_shot[i],'DiagonalCrossShot', enemy_map, map_size)
+        if (max == 5):
+            center = to_be_shot[i]
+
+    if (center == dummy):
+        i = 0
+        if isFireSeekerAvail(state, getShipWeaponEnergy('Submarine', player_ships), player_ships):
+            max = countEffectiveShots(to_be_shot[i],'SeekerMissile', enemy_map, map_size)
+            while (max<25 and i<len(to_be_shot)):
+                i += 1
+                max = countEffectiveShots(to_be_shot[i],'SeekerMissile', enemy_map, map_size)
+            if (max == 25):
+                center = to_be_shot[i]
+
+    if (center == dummy):
+        x,y = to_be_shot[0]
+        cmd = 1
+    else :
+        x,y = to_be_shot[i]
+        if (max ==25):
+            cmd = 7
+        elif (max == 5):
+            cmd = 5   
 
 
 def isEnemyShipKilled(state, last_enemy_ships_count):
