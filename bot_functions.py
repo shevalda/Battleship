@@ -10,31 +10,31 @@ def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_b
         output: (x,y) yang akan dijadikan last_shot yang diberikan ke fungsi arrangingAStrategy & list titik-titik yang mungkin menjadi lokasi kapal lain
     """
     if cmd == 1:        # single shot
-        to_be_shot = bf.updateListOfShot(to_be_shot, point)
+        to_be_shot = updateListOfShot(to_be_shot, point)
     elif cmd == 5:      # diagonal cross shot
         if (not enemy_map[point[0]][point[1]]['Missed']):           # center point
             possibleShipLoc.append((point[0], point[1]))
-        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0], point[1]))
+        to_be_shot = updateListOfShot(to_be_shot, (point[0], point[1]))
 
         if (point[0]-1 >= 0) and (point[1]+1 < map_size):           # north west
             if (not enemy_map[point[0]-1][point[1]+1]['Missed']):
                 possibleShipLoc.append((point[0]-1, point[1]+1))
-        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]-1, point[1]+1))
+        to_be_shot = updateListOfShot(to_be_shot, (point[0]-1, point[1]+1))
 
         if (point[0]+1 < map_size) and (point[1]+1 < map_size):     # north east
             if (not enemy_map[point[0]+1][point[1]+1]['Missed']):
                 possibleShipLoc.append((point[0]+1, point[1]+1))
-        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]+1, point[1]+1))
+        to_be_shot = updateListOfShot(to_be_shot, (point[0]+1, point[1]+1))
 
         if (point[0]+1 < map_size) and (point[1]-1 >= 0):           # south east
             if (not enemy_map[point[0]+1][point[1]-1]['Missed']):
                 possibleShipLoc.append((point[0]+1, point[1]-1))
-        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]+1, point[1]-1))
+        to_be_shot = updateListOfShot(to_be_shot, (point[0]+1, point[1]-1))
 
         if (point[0]-1 >= 0) and (point[1]-1 >= 0):                 # south west
             if (not enemy_map[point[0]-1][point[1]-1]['Missed']):
                 possibleShipLoc.append((point[0]-1, point[1]-1))
-        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]-1, point[1]-1))
+        to_be_shot = updateListOfShot(to_be_shot, (point[0]-1, point[1]-1))
         
         if len(possibleShipLoc) != 0:
             last_shot = possibleShipLoc[0]
@@ -54,11 +54,11 @@ def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_b
                 j += 1
             i += 1
         if (last_shot != (-1,-1)):      # jika ada satu titik yang hit
-            to_be_shot = bf.updateListOfShot(to_be_shot, last_shot)
+            to_be_shot = updateListOfShot(to_be_shot, last_shot)
         else:                           # jika tidak ada titik yang hit
             for i in range(point[0]-2, point[1]+2+1):
                 for j in range(point[1]-2, point[1]+2+1):
-                    to_be_shot = bf.updateListOfShot(to_be_shot, (i,j))
+                    to_be_shot = updateListOfShot(to_be_shot, (i,j))
 
     return last_shot, possibleShipLoc
 
@@ -95,7 +95,7 @@ def createListOfShot(map_size):
             max = max - 1
             min = min + 1
         
-        "inisialisasi ulang setelah nilai min dan max berubah"
+        # inisialisasi ulang setelah nilai min dan max berubah
         
         min = 0 
         max = map_size/2 + 1
