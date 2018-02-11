@@ -73,11 +73,11 @@ def main(player_key):
     if state['Phase'] == 1:     # Phase 1
         to_be_shot = bf.createListOfShot(map_size)
 
-        putVariableInJSONFile(bot_variable_file, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+        putVariableInJSONFile(bot_variable_file, map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
         placeShips(map_size)
     else:                       # Phase 2
-        map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command = getVariablefromJSON(bot_variable_file)
+        map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command = getVariablefromJSON(bot_variable_file)
 
         enemy_map = bf.generateEnemyMap(state, map_size)
         player_ships = state['PlayerMap']['Owner']['Ships']
@@ -89,7 +89,7 @@ def main(player_key):
         last_enemy_ships_count = bf.countEnemyShipsDestroyed(state)
         last_hit_count = bf.getShotsHit(state)
 
-        putVariableInJSONFile(bot_variable_file, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+        putVariableInJSONFile(bot_variable_file, map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
         writeCommand(x, y, cmd)
 
@@ -139,13 +139,12 @@ def writeCommand(x, y, cmd):
     f.close()
 
 
-def putVariableInJSONFile(file_name, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
+def putVariableInJSONFile(file_name, map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
     """
         Menuliskan variabel-variabel dalam program ke file JSON
     """
     data = {}
     data['map_size'] = map_size
-    data['enemy_map'] = enemy_map
     data['player_ships'] = player_ships
     data['enemy_ships'] = enemy_ships
     data['to_be_shot'] = to_be_shot
@@ -171,7 +170,6 @@ def getVariablefromJSON(file_name):
     fn.close()
 
     map_size = data['map_size']
-    enemy_map = data['enemy_map']
     player_ships = data['player_ships']
     enemy_ships = data['enemy_ships']
     to_be_shot = data['to_be_shot']
@@ -183,7 +181,7 @@ def getVariablefromJSON(file_name):
     possibleShipLoc = data['possibleShipLoc']
     last_command = data['last_command']
 
-    return map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command
+    return map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command
 
 
 ### PROTOTYPE ###
@@ -197,7 +195,7 @@ def arrangingAStrategy():
     ships_attacked = bf.playerShipsAttacked(player_ships)
     if ships_attacked != [] and not(bf.isPlayerShieldActive(state)):
         # ketika kapal player sudah diserang dan shield tidak aktif
-        x, y = bf.getShipCenterPoint(ships_attacked[0],player_ships)
+        x, y = bf.getShipCenterPoint(ships_attacked[0] ,player_ships)
         cmd = commands['Shield']
     elif state['Round'] == 1:
         # masih ronde pertama game
@@ -260,10 +258,9 @@ def arrangingAStrategy():
                     last_shot = (x,y)
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
-            # x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+            x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
             cmd = 1
             last_shot = to_be_shot[0]
-            # last_shot = (x,y)
 
     if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang
         possibleShipLoc.remove(x,y)

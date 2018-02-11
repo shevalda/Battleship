@@ -231,7 +231,7 @@ def generateEnemyMap(state, map_size):
     for _ in range(map_size):
         temp = []
         for _ in range(map_size):
-            temp.append(state['PlayerMap']['Cells'][i])
+            temp.append(state['OpponentMap']['Cells'][i])
             i += 1
         map.append(temp)
     return map
@@ -449,4 +449,4 @@ def getShotsHit(state):
             state = [json] data lengkap dari file json
         output: integer jumlah shot hit
     """
-    return state['PlayerMap']['Owner']['ShotsFired']
+    return state['PlayerMap']['Owner']['ShotsHit']
