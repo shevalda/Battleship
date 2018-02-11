@@ -76,18 +76,18 @@ def createListOfShot(map_size):
         max = map_size - 1 #panjang petanya - 1
 
         while (max >= min):
-            [x,y] = [min,min]
-            to_be_shot.append([x,y])
+            (x,y) = (min,min)
+            to_be_shot.append((x,y))
             while (x+2 <= max)  :
                 x= x+2
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append([y,x])
+                    to_be_shot.append((y,x))
             y = y+2
             while (y<=max) :
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append ([y,x])
+                    to_be_shot.append ((y,x))
                 y = y+2
             max = max - 1
             min = min + 1
@@ -98,29 +98,29 @@ def createListOfShot(map_size):
             x = min +1 + add
             y = min + add
             while (x <= max) :
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append ([y,x])
+                    to_be_shot.append ((y,x))
                 x = x + 2
             add = add + 1
     else :
         min = 0
         max = map_size - 1 #panjang petanya - 1
         while (max > min):
-            [x,y] = [min,min]
-            to_be_shot.append([x,y])
+            (x,y) = (min,min)
+            to_be_shot.append((x,y))
 
             while (x+2 < max)  :
                 x= x+2
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append([y,x])
+                    to_be_shot.append((y,x))
             x = x+1
             y = y+1
             while (y<=max) :
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append ([y,x])
+                    to_be_shot.append ((y,x))
                 y = y+2
             max = max - 1
             min = min + 1
@@ -133,9 +133,9 @@ def createListOfShot(map_size):
             x = min +1 + add
             y = min + add
             while (x <= max) :
-                to_be_shot.append([x,y])
+                to_be_shot.append((x,y))
                 if (y != x) :
-                    to_be_shot.append ([y,x])
+                    to_be_shot.append ((y,x))
                 x = x + 2
             add = add + 1
     return to_be_shot
@@ -276,7 +276,7 @@ def nextShipHit(last_shot, first_hit):
         return (last_shot[0] - 1, last_shot[1])
 
 
-def nextSearchShot(enemy_map, to_be_shot,map_size):
+def nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships):
     """
         Menentukan titik mana yang akan ditembak dan dengan senjata apa
         enemy_map = []
@@ -312,7 +312,9 @@ def nextSearchShot(enemy_map, to_be_shot,map_size):
         if (max ==25):
             cmd = 7
         elif (max == 5):
-            cmd = 5   
+            cmd = 5
+    
+    return x, y, cmd
 
 
 def isEnemyShipKilled(state, last_enemy_ships_count):

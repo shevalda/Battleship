@@ -224,7 +224,7 @@ def arrangingAStrategy():
                 else:                           # jika belum ada kapal lain yang lokasinya diketahui
                     found_ship = False
                     first_hit = (-1,-1)     # mereset first_hit
-                    x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
+                    x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
                     last_shot = (x,y)
             else:                                                   # jika ternyata kapal musuh masih belum mati
                 x, y = bf.nextShipHit(last_shot, first_hit)
@@ -255,11 +255,11 @@ def arrangingAStrategy():
                 else:                               # jika belum ada kapal lain yang lokasinya diketahui
                     found_ship = False
                     first_hit = (-1,-1)     # mereset first_hit
-                    x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
+                    x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
                     last_shot = (x,y)
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
-            x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
+            x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
             last_shot = (x,y)
 
     if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang
