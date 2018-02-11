@@ -139,6 +139,10 @@ def createListOfShot(map_size):
                 x = x + 2
             add = add + 1
     return to_be_shot
+<<<<<<< HEAD
+=======
+        # TO BE CONTINUED
+>>>>>>> dd775860715c85d1f9c6cab9805a0f64fff23659
 
 
 def updateListOfShot(to_be_shot, last_shot):
