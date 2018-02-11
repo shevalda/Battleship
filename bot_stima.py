@@ -2,12 +2,13 @@ import os
 import json
 import argparse
 import bot_functions as bf
+from timeit import default_timer
 
 # File and path names
 command_file = "command.txt"
 place_ship_file = "place.txt"
 game_state_file = "state.json"
-output_path = '.'
+# output_path = '.'
 bot_variable_file = "bot_var.json"
 
 # Other variables used in strategy
@@ -128,14 +129,14 @@ def placeShips(ukuran):
     f = open(os.path.join(output_path, place_ship_file), 'w')
     for ship in ships:
         f.write(ship + "\n")
-    f.close
+    f.close()
 
 
 def writeCommand(x, y, cmd):
     " Writing command to command_file text"
     f = open(os.path.join(output_path, command_file), 'w')
     f.write("%d,%d,%d\n" % (cmd, x, y))
-    f.close
+    f.close()
 
 
 def putVariableInJSONFile(file_name, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
@@ -259,8 +260,10 @@ def arrangingAStrategy():
                     last_shot = (x,y)
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
-            x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
-            last_shot = (x,y)
+            # x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+            cmd = 1
+            last_shot = to_be_shot[0]
+            # last_shot = (x,y)
 
     if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang
         possibleShipLoc.remove(x,y)
@@ -270,8 +273,7 @@ def arrangingAStrategy():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('PlayerKey', nargs='?',
-                        help='Player key registered in the game')
+    parser.add_argument('PlayerKey', nargs='?', help='Player key registered in the game')
     parser.add_argument('WorkingDirectory', nargs='?', default=os.getcwd(
     ), help='Directory for the current game files')
     args = parser.parse_args()
