@@ -11,8 +11,8 @@ def createListOfShot(map_size):
 def updateListOfShot(to_be_shot, last_shot):
     """ Mengupdate shot_list dengan menghapus titik yang telah ditembak (last_hit).
         param:
-            to_be_shot = [tuple] titik yang terakhir ditembak
-            shot_list = [list] kumpulan titik yang belum ditembak
+            last_shot = [tuple] titik yang terakhir ditembak
+            to_be_shot = [list] kumpulan titik yang belum ditembak
     """
     if last_shot in to_be_shot:
         to_be_shot.remove(last_shot)
@@ -55,7 +55,7 @@ def playerShipsAttacked(player_ships):
 
 def countEnemyShipsDestroyed(state):
     """
-        Menghitung jumlah kapal musuh yang masih hidup
+        Menghitung jumlah kapal musuh yang sudah mati
         param:
             state = [json] data lengkap dari file json
         output: integer jumlah kapal musuh yang masih hidup
@@ -114,22 +114,22 @@ def nextShipHit(last_shot, first_hit):
     """
         Menentukan titik selanjutnya (pada orientasi yang sama) jika sebelumnya kena hit
         param:
-        last_shot = [tuple] titik terakhir yang ditembak
+            last_shot = [tuple] titik terakhir yang ditembak
             first_hit = [tuple] titik pertama yang pertama kali menemukan kapal
         output: (x,y) yang merupakan titik selanjutnya yang akan ditembak
     """
     if (last_shot[0] == first_hit[0]) and (last_shot[1] > first_hit[1]):
         # sedang menelusuri utara
-        return (first_hit[0], first_hit[1] + 1)
+        return (last_shot[0], last_shot[1] + 1)
     elif (last_shot[0] == first_hit[0]) and (last_shot[1] < first_hit[1]):
         # sedang menelusuri selatan
-        return (first_hit[0], first_hit[1] - 1)
+        return (last_shot[0], last_shot[1] - 1)
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri timur
-        return (first_hit[0] + 1, first_hit[1])
+        return (last_shot[0] + 1, last_shot[1])
     elif (last_shot[0] < first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri barat
-        return (first_hit[0] - 1, first_hit[1])
+        return (last_shot[0] - 1, last_shot[1])
 
 
 def nextSearchShot(enemy_map, to_be_shot):
