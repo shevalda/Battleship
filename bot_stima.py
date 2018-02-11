@@ -8,13 +8,22 @@ command_file = "command.txt"
 place_ship_file = "place.txt"
 game_state_file = "state.json"
 output_path = '.'
+bot_variable_file = "bot_var.json"
 
 # Other variables used in strategy
-map_size = 0
-enemy_map = []         # state-state untuk setiap kotak dalam peta musuh
-player_ships = []       # state-state untuk semua kapal yang dimiliki player
-enemy_ships = []        # nama-nama kapal musuh yang masih hidup
-state = {}              # hasil pembacaan dari file json
+map_size = 0                # ukuran map dari game
+enemy_map = []              # state-state untuk setiap kotak dalam peta musuh
+player_ships = []           # state-state untuk semua kapal yang dimiliki player
+enemy_ships = []            # nama-nama kapal musuh yang masih hidup
+to_be_shot = []             # list titik yang akan ditembak
+found_ship = False          # mengecek apakah kita sudah menemukan sebuah kapal musuh
+first_hit = (-1, -1)        # titik pertama kali menemukan kapal musuh
+last_shot = (-1, -1)        # menyimpan titik (satu atau lebih) terakhir yang ditembak
+last_hit_count = 0          # jumlah hit pada ronde sebelumnya sebelumnya
+last_enemy_ships_count = 5  # kapal-kapal musuh yang masih ada
+possibleShipLoc = []        # list dari titik yang menandakan adanya kapal
+last_command = -1           # command terakhir yang dipanggil
+state = {}                  # hasil pembacaan dari file json
 
 # Command converter
 map_size_name = {
@@ -52,7 +61,7 @@ weapon_ship = {
 
 
 def main(player_key):
-    global state, map_size, to_be_shot, enemy_map, player_ships, last_enemy_ships_count, last_hit_count
+    global state, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command
 
     # Retrieve current game state
     json_file = open(os.path.join(output_path, game_state_file), 'r')
@@ -62,15 +71,24 @@ def main(player_key):
     map_size = state['MapDimension']
     if state['Phase'] == 1:     # Phase 1
         to_be_shot = bf.createListOfShot(map_size)
+
+        putVariableInJSONFile(bot_variable_file, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+
         placeShips(map_size)
     else:                       # Phase 2
+        map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command = getVariablefromJSON(output_path, bot_variable_file)
+
         enemy_map = bf.generateEnemyMap(state, map_size)
         player_ships = state['PlayerMap']['Owner']['Ships']
+
+        bf.decideCoordinatesBeforeStrategy(last_command, last_shot, enemy_map, possibleShipLoc, to_be_shot, map_size)
 
         x, y, cmd = arrangingAStrategy()
 
         last_enemy_ships_count = bf.countEnemyShipsDestroyed(state)
         last_hit_count = bf.getShotsHit(state)
+
+        putVariableInJSONFile(bot_variable_file, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
         writeCommand(x, y, cmd)
 
@@ -81,7 +99,7 @@ def placeShips(ukuran):
     # Ship names: Battleship, Cruiser, Carrier, Destroyer, Submarine
     # Directions: north east south west
 
-    if map_size_name[ukuran] == "small":
+    if ukuran == 7:     # small
         ships = [
             'Battleship 1 2 north',
             'Cruiser 2 6 east',
@@ -89,7 +107,7 @@ def placeShips(ukuran):
             'Destroyer 3 1 north',
             'Submarine 0 0 east'
         ]
-    elif map_size_name[ukuran] == "medium":
+    elif ukuran == 10:  # medium
         ships = [
             'Battleship 6 2 north',
             'Cruiser 1 7 east',
@@ -97,7 +115,7 @@ def placeShips(ukuran):
             'Destroyer 4 3 north',
             'Submarine 1 1 east'
         ]
-    elif map_size_name[ukuran] == "large":
+    elif ukuran == 14:  # large
         ships = [
             'Battleship 7 5 north',
             'Cruiser 2 10 east',
@@ -120,23 +138,60 @@ def writeCommand(x, y, cmd):
     f.close
 
 
+def putVariableInJSONFile(file_name, output_path, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command):
+    """
+        Menuliskan variabel-variabel dalam program ke file JSON
+    """
+    data = {}
+    data['map_size'] = map_size
+    data['enemy_map'] = enemy_map
+    data['player_ships'] = player_ships
+    data['enemy_ships'] = enemy_ships
+    data['to_be_shot'] = to_be_shot
+    data['found_ship'] = found_ship
+    data['first_hit'] = first_hit
+    data['last_shot'] = last_shot
+    data['last_hit_count'] = last_hit_count
+    data['last_enemy_ships_count'] = last_enemy_ships_count
+    data['possibleShipLoc'] = possibleShipLoc
+    data['last_command'] = last_command
+
+    fn = open(os.path.join(output_path, file_name), 'w')
+    json.dump(data, fn)
+    fn.close()
+
+
+def getVariablefromJSON(output_path, file_name):
+    """
+        Memasukkan nilai variabel dari file JSON ke program
+    """
+    fn = open(os.path.join(output_path, file_name), 'r')
+    data = json.load(fn)
+    fn.close()
+
+    map_size = data['map_size']
+    enemy_map = data['enemy_map']
+    player_ships = data['player_ships']
+    enemy_ships = data['enemy_ships']
+    to_be_shot = data['to_be_shot']
+    found_ship = data['found_ship']
+    first_hit = data['first_hit']
+    last_shot = data['last_shot']
+    last_hit_count = data['last_hit_count']
+    last_enemy_ships_count = data['last_enemy_ships_count']
+    possibleShipLoc = data['possibleShipLoc']
+    last_command = data['last_command']
+
+    return map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command
+
+
 ### PROTOTYPE ###
-to_be_shot = []                 # list
-found_ship = False              # mengecek apakah kita sudah menemukan sebuah kapal musuh
-first_hit = (-1, -1)            # titik pertama kali menemukan kapal musuh
-last_shot = (-1, -1)            # menyimpan titik (satu atau lebih) terakhir yang ditembak
-last_hit_count = 0              # jumlah hit pada ronde sebelumnya sebelumnya
-last_enemy_ships_count = 5      # kapal-kapal musuh yang masih ada
-
-
 def arrangingAStrategy():
     """
         Fungsi utama yang menyusun strategi untuk command dan titik apa yang akan diberikan ke game engine
         output: x, y, nomor command yang akan diberikan
-
-        ASUMSI: masih menggunakan SingleShot. Jika menggunakan DiagonalCrossShot, SeekerMissile, DoubleShot, belum tahu gimana nentuin seterusnya
     """
-    global map_size, player_map, player_ships, state, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count
+    global state, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command, commands
 
     ships_attacked = bf.playerShipsAttacked(player_ships)
     if ships_attacked != [] and not(bf.isPlayerShieldActive(state)):
@@ -147,9 +202,8 @@ def arrangingAStrategy():
         # masih ronde pertama game
         x, y = to_be_shot[0]
         last_shot = (x,y)
-        bf.updateListOfShot(to_be_shot, last_shot)
         cmd = commands['SingleShot']
-    else:
+    else:   # player akan menembak
         got_a_hit = bf.isLastShotHit(last_hit_count, state)
         if got_a_hit and not(found_ship):
             # jika ketemu kapal musuh dan sebelumnya tidak menemukan kapal
@@ -157,17 +211,28 @@ def arrangingAStrategy():
             first_hit = last_shot
             x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
             last_shot = (x,y)
-            bf.updateListOfShot(to_be_shot, last_shot)
             cmd = commands['SingleShot']
         elif got_a_hit and first_hit != (-1,-1):
             # jika kapal masih ditemukan dengan orientasi yang sama dengan sebelumnya
-            x, y = bf.nextShipHit(last_shot, first_hit)
-            last_shot = (x,y)
-            bf.updateListOfShot(to_be_shot, last_shot)
-            cmd = commands['SingleShot']
+            if bf.isEnemyShipKilled(state, last_enemy_ships_count): # jika ternyata kapal musuh sudah berkurang
+                if len(possibleShipLoc) != 0:   # masih ada kapal lain yang telah diketahui keberadaannya
+                    first_hit = possibleShipLoc[0]
+                    last_shot = first_hit
+                    possibleShipLoc.remove(possibleShipLoc[0])
+                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+                    cmd = commands['SingleShot']
+                else:                           # jika belum ada kapal lain yang lokasinya diketahui
+                    found_ship = False
+                    first_hit = (-1,-1)     # mereset first_hit
+                    x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
+                    last_shot = (x,y)
+            else:                                                   # jika ternyata kapal musuh masih belum mati
+                x, y = bf.nextShipHit(last_shot, first_hit)
+                last_shot = (x,y)
+                cmd = commands['SingleShot']
         elif not(got_a_hit) and found_ship:
             # jika pada awalnya sudah menemukan kapal tetapi tembakan tidak hit
-            if bf.countEnemyShipsDestroyed(state) == last_enemy_ships_count:
+            if not(bf.isEnemyShipKilled(state, last_enemy_ships_count)):
                 # jika kapal musuh yang hidup ternyata belum berkurang
                 if bf.isEnemyShielded(last_shot, state):
                     # jika ternyata titik sebelumnya di-shield oleh lawan
@@ -178,27 +243,30 @@ def arrangingAStrategy():
                     # mencari orientasi atau satu bagian kapal sudah dihabiskan
                     x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
                     last_shot = (x,y)
-                    to_be_shot = bf.updateListOfShot(to_be_shot, last_shot)
                     cmd = commands['SingleShot']
-                    
-                        # jika ternyata ada dua kapal yang ditembak
-                        # BELUM TAHU MAU DIAPAKAN :(
-                        # TO BE CONTINUED
             else:
                 # jika sebuah kapal sudah dihancurkan
-                found_ship = False
-                first_hit = (-1,-1)     # mereset first_hit
-                x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
-                last_shot = (x,y)
-                to_be_shot = bf.updateListOfShot(to_be_shot, last_shot)
+                if len(possibleShipLoc) != 0:       # masih ada kapal lain yang telah diketahui keberadaannya
+                    first_hit = possibleShipLoc[0]
+                    last_shot = first_hit
+                    possibleShipLoc.remove(possibleShipLoc[0])
+                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+                    cmd = commands['SingleShot']
+                else:                               # jika belum ada kapal lain yang lokasinya diketahui
+                    found_ship = False
+                    first_hit = (-1,-1)     # mereset first_hit
+                    x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
+                    last_shot = (x,y)
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
             x, y, cmd = bf.nextSearchShot(state, to_be_shot, enemy_ships)
             last_shot = (x,y)
-            to_be_shot = bf.updateListOfShot(to_be_shot, last_shot)
 
-    
+    if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang
+        possibleShipLoc.remove(x,y)
+    last_command = cmd
     return x, y, cmd
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

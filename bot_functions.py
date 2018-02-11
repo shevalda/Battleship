@@ -1,3 +1,67 @@
+def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_be_shot, map_size):
+    """
+        - Menentukan apakah point mana yang akan diberikan sebagai last_shot ke fungsi arrangingAStrategy
+        - Mengupdate list possibleShipLoc
+        param:
+            cmd = [integer] kunci dari shot sebelumnya
+            point = [tuple of integer] center point yang ditembak pada ronde sebelumnya
+            enemy_map = [tuple of dictionary] detil peta musuh
+            possibleShipLoc = [tuple of integer] titik-titik pertama menemukan sebuah kapal
+        output: (x,y) yang akan dijadikan last_shot yang diberikan ke fungsi arrangingAStrategy & list titik-titik yang mungkin menjadi lokasi kapal lain
+    """
+    if cmd == 1:        # single shot
+        to_be_shot = bf.updateListOfShot(to_be_shot, point)
+    elif cmd == 5:      # diagonal cross shot
+        if (not enemy_map[point[0]][point[1]]['Missed']):           # center point
+            possibleShipLoc.append((point[0], point[1]))
+        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0], point[1]))
+
+        if (point[0]-1 >= 0) and (point[1]+1 < map_size):           # north west
+            if (not enemy_map[point[0]-1][point[1]+1]['Missed']):
+                possibleShipLoc.append((point[0]-1, point[1]+1))
+        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]-1, point[1]+1))
+
+        if (point[0]+1 < map_size) and (point[1]+1 < map_size):     # north east
+            if (not enemy_map[point[0]+1][point[1]+1]['Missed']):
+                possibleShipLoc.append((point[0]+1, point[1]+1))
+        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]+1, point[1]+1))
+
+        if (point[0]+1 < map_size) and (point[1]-1 >= 0):           # south east
+            if (not enemy_map[point[0]+1][point[1]-1]['Missed']):
+                possibleShipLoc.append((point[0]+1, point[1]-1))
+        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]+1, point[1]-1))
+
+        if (point[0]-1 >= 0) and (point[1]-1 >= 0):                 # south west
+            if (not enemy_map[point[0]-1][point[1]-1]['Missed']):
+                possibleShipLoc.append((point[0]-1, point[1]-1))
+        to_be_shot = bf.updateListOfShot(to_be_shot, (point[0]-1, point[1]-1))
+        
+        if len(possibleShipLoc) != 0:
+            last_shot = possibleShipLoc[0]
+            possibleShipLoc.remove(last_shot)
+        else:
+            last_shot = point
+    elif cmd == 7:  # seeker missile
+        last_shot = (-1,-1)
+        # mengecek apakah ada shot yang hit dari fire seeker
+        i = point[0] - 2
+        while (i <= point[0]+2) and (last_shot == (-1,-1)):
+            j = point[1] - 2
+            while (j <= point[1]+2) and (last_shot == (-1,-1)):
+                if (i >= 0) and (j >= 0) and (i < map_size) and (i < map_size):
+                    if enemy_map[i][j]['Damaged']:
+                        last_shot = (i,j)
+                j += 1
+            i += 1
+        if (last_shot != (-1,-1)):      # jika ada satu titik yang hit
+            to_be_shot = bf.updateListOfShot(to_be_shot, last_shot)
+        else:                           # jika tidak ada titik yang hit
+            for i in range(point[0]-2, point[1]+2+1):
+                for j in range(point[1]-2, point[1]+2+1):
+                    to_be_shot = bf.updateListOfShot(to_be_shot, (i,j))
+
+    return last_shot, possibleShipLoc
+
 def createListOfShot(map_size):
     """
         Membuat list dari titik yang akan ditembak
@@ -16,6 +80,7 @@ def updateListOfShot(to_be_shot, last_shot):
     """
     if last_shot in to_be_shot:
         to_be_shot.remove(last_shot)
+    return to_be_shot
 
 
 def countEffectiveShots(center, weapon, enemy_map):
@@ -142,6 +207,17 @@ def nextSearchShot(enemy_map, to_be_shot):
     # TO BE CONTINUED 
 
 
+def isEnemyShipKilled(state, last_enemy_ships_count):
+    """
+        Mengetahui apakah kapal musuh sudah mati satu
+        param:
+            state = [json]
+            last_enemy_ships_count = [integer] jumlah kapal musuh yang masih hidup
+        output: boolean
+    """
+    return bf.countEnemyShipsDestroyed(state) < last_enemy_ships_count
+
+
 def isLastShotHit(last_hit_count, state):
     """ Mengembalikan nilai boolean jika last hit mengenai kapal.
         param:
@@ -195,17 +271,6 @@ def isDoubleShotAvail(state, charge, list_of_ships):
     return ('Destroyer' in list_of_ships) and (charge <= getShotEnergy(state))
 
 
-# def isOpponentKilled(count_ships_opp, list_opp_ships):
-#     """ Mengembalikan nilai boolean apakah jumlah kapal lawan berkurang dari sebelumnya.
-#         Membandingkan, jika length dari list_opp_ships lebih sedikit dari count_ships_opp
-#         maka akan mengembalikan true.
-#         param:
-#             count_ships_opp = [integer] jumlah kapal sebelum tembakan terakhir
-#             list_opp_ships = [list] list kapal yang dimiliki lawan
-#         output: boolean apakah jumlah kapal lawan lebih sedikit dibandingkan jumlah sebelum tembakan terakhir
-#     """
-
-
 def isEnemyShielded(point, state):
     """
         Mengetahui apakah sebuah titik sedang di-shield oleh tidak (setelah ditembak ke titik itu)
@@ -219,17 +284,17 @@ def isEnemyShielded(point, state):
             return cell['ShieldHit']
 
 
-def isPlayerShipAlive(ship_name, player_ships):
-    """
-        Mencari tahu apakah sebuah kapal masih hidup atau tidak
-        param:
-            ship_name = [string] nama kapal
-            player_ships = []
-        output: boolean apakah kapal masih hidup
-    """
-    for ship in player_ships:
-        if (ship['ShipType'] == ship_name):
-            return not(ship['Destroyed'])
+# def isPlayerShipAlive(ship_name, player_ships):
+#     """
+#         Mencari tahu apakah sebuah kapal masih hidup atau tidak
+#         param:
+#             ship_name = [string] nama kapal
+#             player_ships = []
+#         output: boolean apakah kapal masih hidup
+#     """
+#     for ship in player_ships:
+#         if (ship['ShipType'] == ship_name):
+#             return not(ship['Destroyed'])
 
 
 def isPlayerShieldActive(state):
