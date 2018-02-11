@@ -329,7 +329,7 @@ def isEnemyShipKilled(state, last_enemy_ships_count):
             last_enemy_ships_count = [integer] jumlah kapal musuh yang masih hidup
         output: boolean
     """
-    return countEnemyShipsDestroyed(state) < last_enemy_ships_count
+    return ((5-countEnemyShipsDestroyed(state)) < last_enemy_ships_count)
 
 
 def isPointHasBeenShot (point, enemy_map):

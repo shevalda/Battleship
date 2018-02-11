@@ -83,11 +83,14 @@ def main(player_key):
         player_ships = state['PlayerMap']['Owner']['Ships']
 
         last_shot, possibleShipLoc = bf.decideCoordinatesBeforeStrategy(last_command, last_shot, enemy_map, possibleShipLoc, to_be_shot, map_size)
+        
+        last_hit_count = bf.getShotsHit(state)
+        last_enemy_ships_count = 5 - bf.countEnemyShipsDestroyed(state)
 
         x, y, cmd = arrangingAStrategy()
 
-        last_enemy_ships_count = bf.countEnemyShipsDestroyed(state)
-        last_hit_count = bf.getShotsHit(state)
+        #last_enemy_ships_count = bf.countEnemyShipsDestroyed(state)
+        #last_hit_count = bf.getShotsHit(state)
 
         putVariableInJSONFile(bot_variable_file, map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
@@ -120,7 +123,7 @@ def placeShips(ukuran):
         ships = [
             'Battleship 7 5 north',
             'Cruiser 2 10 east',
-            'Carrier 10 7 east',
+            'Carrier 10 7 north',
             'Destroyer 5 6 north',
             'Submarine 3 2 east'
         ]
@@ -193,11 +196,12 @@ def arrangingAStrategy():
     global state, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command, commands
 
     ships_attacked = bf.playerShipsAttacked(player_ships)
-    if ships_attacked != [] and not(bf.isPlayerShieldActive(state)):
-        # ketika kapal player sudah diserang dan shield tidak aktif
-        x, y = bf.getShipCenterPoint(ships_attacked[0] ,player_ships)
-        cmd = commands['Shield']
-    elif state['Round'] == 1:
+    # if ships_attacked != [] and not(bf.isPlayerShieldActive(state)):
+    #     # ketika kapal player sudah diserang dan shield tidak aktif
+    #     x, y = bf.getShipCenterPoint(ships_attacked[0] ,player_ships)
+    #     cmd = commands['Shield']
+    # elif state['Round'] == 1:
+    if state['Round'] == 1:
         # masih ronde pertama game
         x, y = to_be_shot[0]
         last_shot = (x,y)
