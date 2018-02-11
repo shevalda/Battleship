@@ -71,7 +71,7 @@ def createListOfShot(map_size):
     """
     to_be_shot = []
 
-    if (map_size % 2 == 0) : #panjang dan lebar peta adalah genap
+    if (map_size == "medium" or map_size == "large")  : #panjang dan lebar peta adalah genap
         min = 0
         max = map_size/2
         
@@ -95,8 +95,7 @@ def createListOfShot(map_size):
             max = max - 1
             min = min + 1
         
-        # inisialisasi ulang setelah nilai min dan max berubah
-        
+        # inisialisasi ulang setelah nilai min dan max berubah    
         min = 0 
         max = map_size/2 + 1
         add = 0
@@ -112,7 +111,9 @@ def createListOfShot(map_size):
             add = add + 1
 
         return to_be_shot
-    # TO BE CONTINUED
+    else :
+        
+        # TO BE CONTINUED
 
 
 def updateListOfShot(to_be_shot, last_shot):
