@@ -196,7 +196,7 @@ def arrangingAStrategy():
     global state, map_size, enemy_map, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command, commands
 
     # ships_attacked = bf.playerShipsAttacked(player_ships)
-    # if ships_attacked != [] and not(bf.isPlayerShieldActive(state)):
+    # if ships_attacked != [] and (not bf.isPlayerShieldActive(state)) and (bf.getShieldCharge(state) >= 3):
     #     # ketika kapal player sudah diserang dan shield tidak aktif
     #     x, y = bf.getShipCenterPoint(ships_attacked[0] ,player_ships)
     #     cmd = commands['Shield']
@@ -263,7 +263,7 @@ def arrangingAStrategy():
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
             x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
-            cmd = 1
+            # cmd = 1
             last_shot = to_be_shot[0]
 
     if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang

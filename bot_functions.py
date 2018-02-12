@@ -165,20 +165,24 @@ def countEffectiveShots(center, weapon, enemy_map, map_size):
     """
     count = 0
     if weapon == 'DiagonalCrossShot':
-        if not isPointHasBeenShot((center[0]-1, center[1]+1), enemy_map) and (center[0]-1 >= 0 and center[1]+1 < map_size):
-            count += 1
-        if not isPointHasBeenShot((center[0]-1, center[1]-1), enemy_map) and (center[0]-1 >= 0 and center[1]-1 >=0):
-            count += 1
-        if not isPointHasBeenShot((center[0]+1, center[1]+1), enemy_map) and (center[0]+1 < map_size and center[1]+1 < map_size):
-            count += 1
-        if not isPointHasBeenShot((center[0]+1, center[1]-1), enemy_map) and (center[0]+1 < map_size and center[1]-1 >= 0):
-            count += 1
+        if isPointInMapRange((center[0]-1, center[1]+1), map_size):
+            if not isPointHasBeenShot((center[0]-1, center[1]+1), enemy_map):
+                count += 1
+        if isPointInMapRange((center[0]-1, center[1]-1), map_size):
+            if not isPointHasBeenShot((center[0]-1, center[1]-1), enemy_map):
+                count += 1
+        if isPointInMapRange((center[0]+1, center[1]+1), map_size):
+            if not isPointHasBeenShot((center[0]+1, center[1]+1), enemy_map):
+                count += 1
+        if isPointInMapRange((center[0]+1, center[1]-1), map_size):
+            if not isPointHasBeenShot((center[0]+1, center[1]-1), enemy_map):
+                count += 1
         if not isPointHasBeenShot(center, enemy_map):
             count += 1
     elif weapon == 'SeekerMissile':
         for i in range (-2,2+1):
             for j in range (-2,2+1):
-                if (i >= 0 and j >= 0) and (i < map_size and j < map_size):
+                if isPointInMapRange((i,j),map_size):
                     if not isPointHasBeenShot((center[0]+i,center[1]+j), enemy_map):
                         count += 1
     return count
@@ -390,14 +394,19 @@ def isCrossShotDiagonalAvail(state, charge, list_of_ships):
         Mengembalikan nilai boolean apakah kita dapat menggunakan tembakan
         Cross Shot Diagonal.
         Tembakan ini dapat digunakan jika kapal Battleship masih ada di dalam
-        list kapal dan memiliki 12 charge.
+        list kapal dan charge yang dimiliki player lebih banyak dibanding charge yang dibutuhkan untuk nembakkan Cross Shot Diagonal.
         param:
             state = [json] data lengkap dari file json
             charge = [integer] jumlah energi yang masih kita miliki
             list_of_ships = [list] list kapal yang kita miliki
         output: boolean bisa tidaknya senjata digunakan
     """
-    return ('Battleship' in list_of_ships) and (charge <= getShotEnergy(state))
+    found = False 
+    for ship in list_of_ships:
+        if (ship['ShipType'] == 'Battleship'):
+            found = True
+            break
+    return found and (charge <= getShotEnergy(state))
 
 
 def isFireSeekerAvail(state, charge, list_of_ships):
@@ -411,7 +420,12 @@ def isFireSeekerAvail(state, charge, list_of_ships):
             list_of_ships = [list] list kapal yang kita miliki
         output: boolean bisa tidaknya senjata digunakan
     """
-    return ('Submarine' in list_of_ships) and (charge <= getShotEnergy(state))
+    found = False 
+    for ship in list_of_ships:
+        if (ship['ShipType'] == 'Submarine'):
+            found = True
+            break
+    return found and (charge <= getShotEnergy(state))
 
 
 def isEnemyShielded(point, state):
@@ -482,3 +496,13 @@ def getShotsHit(state):
         output: integer jumlah shot hit
     """
     return state['PlayerMap']['Owner']['ShotsHit']
+
+
+def getShieldCharge(state):
+    """
+        Mengetahui jumlah charge untuk shield
+        param:
+            state = [json] data lengkap dari file json
+        output: integer jumlah charge shield
+    """
+    return state['PlayerMap']['Owner']['Shield']['CurrentCharges']
