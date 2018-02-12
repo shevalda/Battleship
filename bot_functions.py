@@ -94,18 +94,18 @@ def createListOfShot(map_size):
                 y = y+2
             max = max - 1
             min = min + 1
-        min = 0
-        max = map_size - 1
-        add = 0
-        while (y < max) :
-            x = min +1 + add
-            y = min + add
-            while (x <= max) :
-                to_be_shot.append((x,y))
-                if (y != x) :
-                    to_be_shot.append ((y,x))
-                x = x + 2
-            add = add + 1
+        # min = 0
+        # max = map_size - 1
+        # add = 0
+        # while (y < max) :
+        #     x = min +1 + add
+        #     y = min + add
+        #     while (x <= max) :
+        #         to_be_shot.append((x,y))
+        #         if (y != x) :
+        #             to_be_shot.append ((y,x))
+        #         x = x + 2
+        #     add = add + 1
     else :
         min = 0
         max = map_size - 1 #panjang petanya - 1
@@ -127,20 +127,20 @@ def createListOfShot(map_size):
                 y = y+2
             max = max - 1
             min = min + 1
-        min = 0
-        max = map_size - 1 #panjang petanya - 1
-        add = 0
-        x = min +1 + add
-        y = min + add
-        while (y < max) :
-            x = min +1 + add
-            y = min + add
-            while (x <= max) :
-                to_be_shot.append((x,y))
-                if (y != x) :
-                    to_be_shot.append ((y,x))
-                x = x + 2
-            add = add + 1
+        # min = 0
+        # max = map_size - 1 #panjang petanya - 1
+        # add = 0
+        # x = min + 1 + add
+        # y = min + add
+        # while (y < max) :
+        #     x = min +1 + add
+        #     y = min + add
+        #     while (x <= max) :
+        #         to_be_shot.append((x,y))
+        #         if (y != x) :
+        #             to_be_shot.append ((y,x))
+        #         x = x + 2
+        #     add = add + 1
     return to_be_shot
 
 def updateListOfShot(to_be_shot, last_shot):
@@ -329,7 +329,7 @@ def isEnemyShipKilled(state, last_enemy_ships_count):
             last_enemy_ships_count = [integer] jumlah kapal musuh yang masih hidup
         output: boolean
     """
-    return ((5-countEnemyShipsDestroyed(state)) < last_enemy_ships_count)
+    return (5-countEnemyShipsDestroyed(state)) < (5 -last_enemy_ships_count)
 
 
 def isPointHasBeenShot (point, enemy_map):
