@@ -236,7 +236,7 @@ def generateEnemyMap(state, map_size):
         map.append(temp)
     return map
 
-def nextOrientationHitPoint(last_shot, first_hit):
+def nextOrientationHitPoint(last_shot, first_hit, map_size):
     """
         Menentukan titik yang akan diserang berikutnya jika pada satu arah tidak berhasil mengenai kapal
         param:
@@ -246,19 +246,28 @@ def nextOrientationHitPoint(last_shot, first_hit):
     """
     if (last_shot == first_hit):
         # pertama kali akan menentukan arah
-        return (first_hit[0], first_hit[1] + 1)
+        if isPointInMapRange((first_hit[0], first_hit[1] + 1), map_size):
+            return (first_hit[0], first_hit[1] + 1)
+        else:
+            return nextOrientationHitPoint((first_hit[0], first_hit[1] + 1), first_hit, map_size)
     elif (last_shot[0] == first_hit[0]) and (last_shot[1] > first_hit[1]):
         # setelah menelusuri utara
-        return (first_hit[0], first_hit[1] - 1)
+        if isPointInMapRange((first_hit[0], first_hit[1] - 1), map_size):
+            return (first_hit[0], first_hit[1] - 1)
+        else:
+            return nextOrientationHitPoint((first_hit[0], first_hit[1] - 1), first_hit, map_size)
     elif (last_shot[0] == first_hit[0]) and (last_shot[1] < first_hit[1]):
         # setelah menelusuri selatan
-        return (first_hit[0] + 1, first_hit[1])
+        if isPointInMapRange((first_hit[0] + 1, first_hit[1]), map_size):
+            return (first_hit[0] + 1, first_hit[1])
+        else:
+            return nextOrientationHitPoint((first_hit[0] + 1, first_hit[1]), first_hit, map_size)
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri timur
         return (first_hit[0] - 1, first_hit[1])
 
 
-def nextShipHit(last_shot, first_hit):
+def nextShipHit(last_shot, first_hit, map_size):
     """
         Menentukan titik selanjutnya (pada orientasi yang sama) jika sebelumnya kena hit
         param:
@@ -268,16 +277,28 @@ def nextShipHit(last_shot, first_hit):
     """
     if (last_shot[0] == first_hit[0]) and (last_shot[1] > first_hit[1]):
         # sedang menelusuri utara
-        return (last_shot[0], last_shot[1] + 1)
+        if isPointInMapRange((last_shot[0], last_shot[1] + 1), map_size):
+            return (last_shot[0], last_shot[1] + 1)
+        else:
+            return nextOrientationHitPoint((last_shot[0], last_shot[1] + 1), first_hit, map_size)
     elif (last_shot[0] == first_hit[0]) and (last_shot[1] < first_hit[1]):
         # sedang menelusuri selatan
-        return (last_shot[0], last_shot[1] - 1)
+        if isPointInMapRange((last_shot[0], last_shot[1] - 1), map_size):
+            return (last_shot[0], last_shot[1] - 1)
+        else:
+            return nextOrientationHitPoint((last_shot[0], last_shot[1] - 1), first_hit, map_size)
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri timur
-        return (last_shot[0] + 1, last_shot[1])
+        if isPointInMapRange((last_shot[0] + 1, last_shot[1]), map_size):
+            return (last_shot[0] + 1, last_shot[1])
+        else:
+            return nextOrientationHitPoint((last_shot[0] + 1, last_shot[1]), first_hit, map_size)
     elif (last_shot[0] < first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri barat
-        return (last_shot[0] - 1, last_shot[1])
+        if isPointInMapRange((last_shot[0] - 1, last_shot[1]), map_size):
+            return (last_shot[0] - 1, last_shot[1])
+        else:
+            return nextOrientationHitPoint((last_shot[0] - 1, last_shot[1]), first_hit, map_size)
 
 
 def nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships):
@@ -319,6 +340,17 @@ def nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships):
             cmd = 5
     
     return x, y, cmd
+
+
+def isPointInMapRange(point, map_size):
+    """
+        Menentukan apakah suatu titik berada di dalam peta
+        param:
+            point = [tuple] titik yang ingin dicek
+            map_size = [integer] ukuran peta game
+        output: boolean
+    """
+    return (point[0] >= 0) and (point[0] < map_size) and (point[1] >= 0) and (point[1] < map_size)
 
 
 def isEnemyShipKilled(state, last_enemy_ships_count):

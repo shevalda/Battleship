@@ -212,7 +212,7 @@ def arrangingAStrategy():
             # jika ketemu kapal musuh dan sebelumnya tidak menemukan kapal
             found_ship = True
             first_hit = last_shot
-            x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+            x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
             last_shot = (x,y)
             cmd = commands['SingleShot']
         elif got_a_hit and first_hit != (-1,-1):
@@ -222,7 +222,7 @@ def arrangingAStrategy():
                     first_hit = possibleShipLoc[0]
                     last_shot = first_hit
                     possibleShipLoc.remove(possibleShipLoc[0])
-                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
                     cmd = commands['SingleShot']
                 else:                           # jika belum ada kapal lain yang lokasinya diketahui
                     found_ship = False
@@ -230,7 +230,7 @@ def arrangingAStrategy():
                     x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
                     last_shot = (x,y)
             else:                                                   # jika ternyata kapal musuh masih belum mati
-                x, y = bf.nextShipHit(last_shot, first_hit)
+                x, y = bf.nextShipHit(last_shot, first_hit, map_size)
                 last_shot = (x,y)
                 cmd = commands['SingleShot']
         elif not(got_a_hit) and found_ship:
@@ -244,7 +244,7 @@ def arrangingAStrategy():
                     cmd = commands['SingleShot']
                 else:
                     # mencari orientasi atau satu bagian kapal sudah dihabiskan
-                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
                     last_shot = (x,y)
                     cmd = commands['SingleShot']
             else:
@@ -253,7 +253,7 @@ def arrangingAStrategy():
                     first_hit = possibleShipLoc[0]
                     last_shot = first_hit
                     possibleShipLoc.remove(possibleShipLoc[0])
-                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit)
+                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
                     cmd = commands['SingleShot']
                 else:                               # jika belum ada kapal lain yang lokasinya diketahui
                     found_ship = False
