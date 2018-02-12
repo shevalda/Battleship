@@ -379,14 +379,14 @@ def isPointHasBeenShot (point, enemy_map):
     return (enemy_map[point[0]][point[1]]['Damaged'] and not(enemy_map[point[0]][point[1]]['Missed'])) or (not(enemy_map[point[0]][point[1]]['Damaged']) and enemy_map[point[0]][point[1]]['Missed'])
 
 
-def isLastShotHit(last_hit_count, state):
+def isLastShotHit(point, enemy_map):
     """ Mengembalikan nilai boolean jika last hit mengenai kapal.
         param:
-            last_hit_count = [integer] jumlah hit sebelumnya
+            point = [integer] jumlah hit sebelumnya
             state = [json] data lengkap game dari file json
         output: boolean
     """
-    return last_hit_count < getShotsHit(state)
+    return enemy_map[point[0]][point[1]]['Damaged']
 
 
 def isCrossShotDiagonalAvail(state, charge, list_of_ships):

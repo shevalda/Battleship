@@ -94,6 +94,8 @@ def main(player_key):
 
         putVariableInJSONFile(bot_variable_file, map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
 
+        putVariableInJSONFile(os.path.join(output_path, bot_variable_file), map_size, player_ships, enemy_ships, to_be_shot, found_ship, first_hit, last_shot, last_hit_count, last_enemy_ships_count, possibleShipLoc, last_command)
+
         writeCommand(x, y, cmd)
 
 
@@ -207,7 +209,7 @@ def arrangingAStrategy():
         last_shot = (x,y)
         cmd = commands['SingleShot']
     else:   # player akan menembak
-        got_a_hit = bf.isLastShotHit(last_hit_count, state)
+        got_a_hit = bf.isLastShotHit(last_shot,enemy_map)
         if got_a_hit and not(found_ship):
             # jika ketemu kapal musuh dan sebelumnya tidak menemukan kapal
             found_ship = True
@@ -264,10 +266,10 @@ def arrangingAStrategy():
             # belum ketemu kapal sejak tembakan sebelumnya
             x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
             # cmd = 1
-            last_shot = to_be_shot[0]
+            last_shot = x,y
 
     if ((x,y) in possibleShipLoc) and cmd != commands['Shield']:        # jika ternyata titik berada di kapal yang sedang diserang
-        possibleShipLoc.remove(x,y)
+        possibleShipLoc.remove((x,y))
     last_command = cmd
     return x, y, cmd
 
