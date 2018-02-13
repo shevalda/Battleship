@@ -112,37 +112,29 @@ def updateListOfShot(to_be_shot, last_shot):
     return to_be_shot
 
 
-def countEffectiveShots(center, weapon, enemy_map, map_size):
+def countEffectiveShots(center, enemy_map, map_size):
     """
         Menghitung tembakan yang efektif jika diketahui center point dan jenis tembakannya
         param:
             center = [tuple] center point dari tembakan
-            weapon = [string] jenis tembakannya
             enemy_map = [list of list] peta musuh berserta detilnya
         output:  integer jumlah titik shot yang belum ditembak sebelumnya
     """
     count = 0
-    if weapon == 'DiagonalCrossShot':
-        if isPointInMapRange((center[0]-1, center[1]+1), map_size):
-            if not isPointHasBeenShot((center[0]-1, center[1]+1), enemy_map):
-                count += 1
-        if isPointInMapRange((center[0]-1, center[1]-1), map_size):
-            if not isPointHasBeenShot((center[0]-1, center[1]-1), enemy_map):
-                count += 1
-        if isPointInMapRange((center[0]+1, center[1]+1), map_size):
-            if not isPointHasBeenShot((center[0]+1, center[1]+1), enemy_map):
-                count += 1
-        if isPointInMapRange((center[0]+1, center[1]-1), map_size):
-            if not isPointHasBeenShot((center[0]+1, center[1]-1), enemy_map):
-                count += 1
-        if not isPointHasBeenShot(center, enemy_map):
+    if isPointInMapRange((center[0]-1, center[1]+1), map_size):
+        if not isPointHasBeenShot((center[0]-1, center[1]+1), enemy_map):
             count += 1
-    elif weapon == 'SeekerMissile':
-        for i in range (-2,2+1):
-            for j in range (-2,2+1):
-                if isPointInMapRange((i,j),map_size):
-                    if not isPointHasBeenShot((center[0]+i,center[1]+j), enemy_map):
-                        count += 1
+    if isPointInMapRange((center[0]-1, center[1]-1), map_size):
+        if not isPointHasBeenShot((center[0]-1, center[1]-1), enemy_map):
+            count += 1
+    if isPointInMapRange((center[0]+1, center[1]+1), map_size):
+        if not isPointHasBeenShot((center[0]+1, center[1]+1), enemy_map):
+            count += 1
+    if isPointInMapRange((center[0]+1, center[1]-1), map_size):
+        if not isPointHasBeenShot((center[0]+1, center[1]-1), enemy_map):
+            count += 1
+    if not isPointHasBeenShot(center, enemy_map):
+        count += 1
     return count
 
 
@@ -261,10 +253,10 @@ def nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships):
     center = dummy
     i = 0
     if isCrossShotDiagonalAvail(state, getShipWeaponEnergy('Battleship', player_ships), player_ships):
-        max = countEffectiveShots(to_be_shot[i],'DiagonalCrossShot', enemy_map, map_size)
+        max = countEffectiveShots(to_be_shot[i], enemy_map, map_size)
         while (max<5 and i<len(to_be_shot)):
             i += 1
-            max = countEffectiveShots(to_be_shot[i],'DiagonalCrossShot', enemy_map, map_size)
+            max = countEffectiveShots(to_be_shot[i], enemy_map, map_size)
         if (max == 5):
             center = to_be_shot[i]
 
