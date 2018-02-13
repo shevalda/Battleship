@@ -38,32 +38,13 @@ def decideCoordinatesBeforeStrategy(cmd, point, enemy_map, possibleShipLoc, to_b
                 possibleShipLoc.append((point[0]-1, point[1]-1))
         to_be_shot = updateListOfShot(to_be_shot, (point[0]-1, point[1]-1))
         
-        if len(possibleShipLoc) != 0:
+        if len(possibleShipLoc) != 0:   # jika setidaknya ada yang satu dari lima shot yang hit
             last_shot = possibleShipLoc[0]
             possibleShipLoc.remove(last_shot)
-        else:
+        else:                           # jika tidak ada shot yang hit
             last_shot = point
-    elif cmd == 7:  # seeker missile
-        last_shot = (-1,-1)
-        # mengecek apakah ada shot yang hit dari fire seeker
-        i = point[0] - 2
-        while (i <= point[0]+2) and (last_shot == (-1,-1)):
-            j = point[1] - 2
-            while (j <= point[1]+2) and (last_shot == (-1,-1)):
-                if (i >= 0) and (j >= 0) and (i < map_size) and (i < map_size):
-                    if enemy_map[i][j]['Damaged']:
-                        last_shot = (i,j)
-                j += 1
-            i += 1
-        if (last_shot != (-1,-1)):      # jika ada satu titik yang hit
-            to_be_shot = updateListOfShot(to_be_shot, last_shot)
-        else:                           # jika tidak ada titik yang hit
-            for i in range(point[0]-2, point[1]+2+1):
-                for j in range(point[1]-2, point[1]+2+1):
-                    to_be_shot = updateListOfShot(to_be_shot, (i,j))
-            last_shot = point
-
     return last_shot, possibleShipLoc
+
 
 def createListOfShot(map_size):
     """
@@ -94,18 +75,6 @@ def createListOfShot(map_size):
                 y = y+2
             max = max - 1
             min = min + 1
-        # min = 0
-        # max = map_size - 1
-        # add = 0
-        # while (y < max) :
-        #     x = min +1 + add
-        #     y = min + add
-        #     while (x <= max) :
-        #         to_be_shot.append((x,y))
-        #         if (y != x) :
-        #             to_be_shot.append ((y,x))
-        #         x = x + 2
-        #     add = add + 1
     else :
         min = 0
         max = map_size - 1 #panjang petanya - 1
@@ -127,27 +96,16 @@ def createListOfShot(map_size):
                 y = y+2
             max = max - 1
             min = min + 1
-        # min = 0
-        # max = map_size - 1 #panjang petanya - 1
-        # add = 0
-        # x = min + 1 + add
-        # y = min + add
-        # while (y < max) :
-        #     x = min +1 + add
-        #     y = min + add
-        #     while (x <= max) :
-        #         to_be_shot.append((x,y))
-        #         if (y != x) :
-        #             to_be_shot.append ((y,x))
-        #         x = x + 2
-        #     add = add + 1
     return to_be_shot
 
+
 def updateListOfShot(to_be_shot, last_shot):
-    """ Mengupdate shot_list dengan menghapus titik yang telah ditembak (last_hit).
+    """ 
+        Mengupdate shot_list dengan menghapus titik yang telah ditembak (last_hit).
         param:
             last_shot = [tuple] titik yang terakhir ditembak
             to_be_shot = [list] kumpulan titik yang belum ditembak
+        output: list titik yang akan ditembak
     """
     if last_shot in to_be_shot:
         to_be_shot.remove(last_shot)
@@ -188,26 +146,6 @@ def countEffectiveShots(center, weapon, enemy_map, map_size):
     return count
 
 
-def playerShipsAttacked(player_ships):
-    """
-        Mengecek list kapal yang terkena tembak dari musuh tetapi belum mati
-        param:
-            player_ships: [array of dictionary] info-info lengkap mengenai kapal player
-        output: mengembalikan list nama-nama kapal yang terkena hit tetapi belum mati
-    """
-    list_of_ships = []
-    for ship in player_ships:
-        if not ship['Destroyed']:
-            i = 0
-            hit = False
-            while i < len(ship['Cells']) and not(hit):
-                if ship['Cells'][i]['Hit']:
-                    list_of_ships.append(ship['ShipType'])
-                    hit = True
-                i += 1
-    return list_of_ships
-
-
 def countEnemyShipsDestroyed(state):
     """
         Menghitung jumlah kapal musuh yang sudah mati
@@ -239,6 +177,7 @@ def generateEnemyMap(state, map_size):
             i += 1
         map.append(temp)
     return map
+
 
 def nextOrientationHitPoint(last_shot, first_hit, map_size):
     """
@@ -277,7 +216,6 @@ def nextOrientationHitPoint(last_shot, first_hit, map_size):
         return (-1,-1)
 
 
-
 def nextShipHit(last_shot, first_hit, map_size):
     """
         Menentukan titik selanjutnya (pada orientasi yang sama) jika sebelumnya kena hit
@@ -299,13 +237,13 @@ def nextShipHit(last_shot, first_hit, map_size):
         else:
             return nextOrientationHitPoint((last_shot[0], last_shot[1] - 1), first_hit, map_size)
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
-        # setelah menelusuri timur
+        # sedang menelusuri timur
         if isPointInMapRange((last_shot[0] + 1, last_shot[1]), map_size):
             return (last_shot[0] + 1, last_shot[1])
         else:
             return nextOrientationHitPoint((last_shot[0] + 1, last_shot[1]), first_hit, map_size)
     elif (last_shot[0] < first_hit[0]) and (last_shot[1] == first_hit[1]):
-        # setelah menelusuri barat
+        # sedang menelusuri barat
         if isPointInMapRange((last_shot[0] - 1, last_shot[1]), map_size):
             return (last_shot[0] - 1, last_shot[1])
         else:
@@ -331,24 +269,11 @@ def nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships):
             center = to_be_shot[i]
 
     if (center == dummy):
-        i = 0
-        if isFireSeekerAvail(state, getShipWeaponEnergy('Submarine', player_ships), player_ships):
-            max = countEffectiveShots(to_be_shot[i],'SeekerMissile', enemy_map, map_size)
-            while (max<25 and i<len(to_be_shot)):
-                i += 1
-                max = countEffectiveShots(to_be_shot[i],'SeekerMissile', enemy_map, map_size)
-            if (max == 25):
-                center = to_be_shot[i]
-
-    if (center == dummy):
         x,y = to_be_shot[0]
         cmd = 1
     else :
         x,y = to_be_shot[i]
-        if (max ==25):
-            cmd = 7
-        elif (max == 5):
-            cmd = 5
+        cmd = 5
     
     return x, y, cmd
 
@@ -368,11 +293,11 @@ def isEnemyShipKilled(state, last_enemy_ships_count):
     """
         Mengetahui apakah kapal musuh sudah mati satu
         param:
-            state = [json]
+            state = [json] data lengkap game dari file json
             last_enemy_ships_count = [integer] jumlah kapal musuh yang masih hidup
         output: boolean
     """
-    return (5-countEnemyShipsDestroyed(state)) < (5 -last_enemy_ships_count)
+    return countEnemyShipsDestroyed(state) > last_enemy_ships_count
 
 
 def isPointHasBeenShot (point, enemy_map):
@@ -404,7 +329,7 @@ def isCrossShotDiagonalAvail(state, charge, list_of_ships):
         list kapal dan charge yang dimiliki player lebih banyak dibanding charge yang dibutuhkan untuk nembakkan Cross Shot Diagonal.
         param:
             state = [json] data lengkap dari file json
-            charge = [integer] jumlah energi yang masih kita miliki
+            charge = [integer] jumlah energi yang dibutuhkan untuk menembakkan Cross Shot Diagonal
             list_of_ships = [list] list kapal yang kita miliki
         output: boolean bisa tidaknya senjata digunakan
     """
@@ -413,26 +338,7 @@ def isCrossShotDiagonalAvail(state, charge, list_of_ships):
         if (ship['ShipType'] == 'Battleship'):
             found = True
             break
-    return found and (charge <= getShotEnergy(state))
-
-
-def isFireSeekerAvail(state, charge, list_of_ships):
-    """ Mengembalikan nilai boolean apakah kita dapat menggunakan tembakan
-        Fire seeker.
-        Senjata ini dapat digunakan jika kapal Submarine masih ada di dalam
-        list kapal dan memiliki 10 charge.
-        param:
-            state = [json] data lengkap dari file json
-            charge = [integer] jumlah energi yang masih kita miliki
-            list_of_ships = [list] list kapal yang kita miliki
-        output: boolean bisa tidaknya senjata digunakan
-    """
-    found = False 
-    for ship in list_of_ships:
-        if (ship['ShipType'] == 'Submarine'):
-            found = True
-            break
-    return found and (charge <= getShotEnergy(state))
+    return found and (charge <= state['PlayerMap']['Owner']['Energy'])
 
 
 def isEnemyShielded(point, state):
@@ -448,16 +354,6 @@ def isEnemyShielded(point, state):
             return cell['ShieldHit']
 
 
-def isPlayerShieldActive(state):
-    """
-        Mengetahui apakah shield pemain sudah/masih aktif
-        param:
-            state = [json] data lengkap game dari file json
-        output: boolean yang menyatakan shield pemain masih aktif
-    """
-    return state['PlayerMap']['Owner']['Shield']['Active']
-
-
 def getShipWeaponEnergy(ship_name, player_ships):
     """
         Mengembalikan nilai energi yang butuhkan senjata khusus sebuah kapal
@@ -469,47 +365,3 @@ def getShipWeaponEnergy(ship_name, player_ships):
     for ship in player_ships:
         if (ship['ShipType'] == ship_name):
             return ship['Weapons'][1]['EnergyRequired']
-
-
-def getShipCenterPoint(ship_name, player_ships):
-    """
-        Mencari titik tengah sebuah kapal
-        param:
-            ship_name = [string] nama kapal
-            player_ships: [array of dictionary] info-info lengkap mengenai kapal player
-        output: tuple (x,y) titik tengah kapal
-    """
-    for ship in player_ships:
-        if (ship['ShipType'] == ship_name):
-            ship_center = (len(ship['Cells']) - 1) // 2
-            return (ship['Cells'][ship_center]['X'], ship['Cells'][ship_center]['Y'])
-
-
-def getShotEnergy(state):
-    """
-        Mengetahui jumlah energi yang tersisa untuk menembak
-        param:
-            state = [json] data lengkap dari file json
-        output: integer jumlah energi
-    """
-    return state['PlayerMap']['Owner']['Energy']
-
-
-def getShotsHit(state):
-    """
-        Mengetahui jumlah shot hit terhadap musuh
-        param:
-            state = [json] data lengkap dari file json
-        output: integer jumlah shot hit
-    """
-    return state['PlayerMap']['Owner']['ShotsHit']
-
-
-def getShieldCharge(state):
-    """
-        Mengetahui jumlah charge untuk shield
-        param:
-            state = [json] data lengkap dari file json
-        output: integer jumlah charge shield
-    """
-    return state['PlayerMap']['Owner']['Shield']['CurrentCharges']
