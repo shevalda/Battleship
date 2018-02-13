@@ -268,7 +268,14 @@ def nextOrientationHitPoint(last_shot, first_hit, map_size):
             return nextOrientationHitPoint((first_hit[0] + 1, first_hit[1]), first_hit, map_size)
     elif (last_shot[0] > first_hit[0]) and (last_shot[1] == first_hit[1]):
         # setelah menelusuri timur
-        return (first_hit[0] - 1, first_hit[1])
+        if isPointInMapRange((first_hit[0] - 1, first_hit[1]), map_size):
+            return (first_hit[0] - 1, first_hit[1])
+        else:
+            return nextOrientationHitPoint((first_hit[0] - 1, first_hit[1]), first_hit, map_size)
+    else:
+        # setelah menelusuri di barat
+        return (-1,-1)
+
 
 
 def nextShipHit(last_shot, first_hit, map_size):

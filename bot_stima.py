@@ -215,8 +215,11 @@ def arrangingAStrategy():
             found_ship = True
             first_hit = last_shot
             x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
-            last_shot = (x,y)
             cmd = commands['SingleShot']
+            # if (x,y) == (-1,-1):
+            #     x,y,cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+            #     found_ship = False
+            last_shot = (x,y)
         elif got_a_hit and first_hit != (-1,-1):
             # jika kapal masih ditemukan dengan orientasi yang sama dengan sebelumnya
             if bf.isEnemyShipKilled(state, last_enemy_ships_count): # jika ternyata kapal musuh sudah berkurang
@@ -226,6 +229,10 @@ def arrangingAStrategy():
                     possibleShipLoc.remove(possibleShipLoc[0])
                     x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
                     cmd = commands['SingleShot']
+                    if (x,y) == (-1,-1):
+                        x,y,cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+                        found_ship = False
+                    last_shot = (x,y)
                 else:                           # jika belum ada kapal lain yang lokasinya diketahui
                     found_ship = False
                     first_hit = (-1,-1)     # mereset first_hit
@@ -247,21 +254,27 @@ def arrangingAStrategy():
                 else:
                     # mencari orientasi atau satu bagian kapal sudah dihabiskan
                     x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
-                    last_shot = (x,y)
                     cmd = commands['SingleShot']
-            else:
-                # jika sebuah kapal sudah dihancurkan
-                if len(possibleShipLoc) != 0:       # masih ada kapal lain yang telah diketahui keberadaannya
-                    first_hit = possibleShipLoc[0]
-                    last_shot = first_hit
-                    possibleShipLoc.remove(possibleShipLoc[0])
-                    x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
-                    cmd = commands['SingleShot']
-                else:                               # jika belum ada kapal lain yang lokasinya diketahui
-                    found_ship = False
-                    first_hit = (-1,-1)     # mereset first_hit
-                    x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+                    if (x,y) == (-1,-1):
+                        x,y,cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+                        found_ship = False
                     last_shot = (x,y)
+            # else:
+            #     # jika sebuah kapal sudah dihancurkan
+            #     if len(possibleShipLoc) != 0:       # masih ada kapal lain yang telah diketahui keberadaannya
+            #         first_hit = possibleShipLoc[0]
+            #         last_shot = first_hit
+            #         possibleShipLoc.remove(possibleShipLoc[0])
+            #         x, y = bf.nextOrientationHitPoint(last_shot, first_hit, map_size)
+            #         if (x,y) == (-1,-1):
+            #             x,y = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+            #             found_ship = False
+            #         cmd = commands['SingleShot']
+            #     else:                               # jika belum ada kapal lain yang lokasinya diketahui
+            #         found_ship = False
+            #         first_hit = (-1,-1)     # mereset first_hit
+            #         x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
+            #         last_shot = (x,y)
         else:
             # belum ketemu kapal sejak tembakan sebelumnya
             x, y, cmd = bf.nextSearchShot(enemy_map, to_be_shot, map_size, state, player_ships)
