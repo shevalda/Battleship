@@ -76,10 +76,6 @@ def main(player_key):
 
         putVariableInJSONFile(bot_variable_file, map_size, player_ships, to_be_shot, found_ship, first_hit, last_shot, last_enemy_ships_count, possibleShipLoc, last_command)
 
-        # BEGIN - TO BE DELETED
-        putVariableInJSONFile(os.path.join(output_path, bot_variable_file), map_size, player_ships, to_be_shot, found_ship, first_hit, last_shot, last_enemy_ships_count, possibleShipLoc, last_command)
-        # END - TO BE DELETED
-
         writeCommand(x, y, cmd)
 
 
